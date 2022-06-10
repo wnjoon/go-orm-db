@@ -44,6 +44,7 @@ func prepareAndExcute(org, mnemonic, passphrase string) int64 {
 
 	row, err := execResult.RowsAffected()
 	util.HandleErr(err, util.ErrRowUpdate)
+
 	return row
 }
 
