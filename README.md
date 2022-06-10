@@ -4,7 +4,9 @@ Test ORM using golang
 ## Oracle
 
 Wish to use ORM but no reference and libraries found.  
-And There is **NO WAY** to use Oracle DB in **MAC M1**. -> Installed it to AWS Ubuntu 20.04
+And There is **NO WAY** to use Oracle DB in **MAC M1**. -> Installed it to AWS Ubuntu 20.04.  
+
+> Posted on my blog : [Handling oracle database using golang](https://wnjoon.github.io/go/oraclego/)
 
 ## MariaDB
 
@@ -14,12 +16,16 @@ And There is **NO WAY** to use Oracle DB in **MAC M1**. -> Installed it to AWS U
 
 ```sh
 $ docker pull mariadb
+# If you want another verion (10.3)
+$ docker pull mariadb:10.3
 ```
 
 2. Start container
 
 ```sh
 $ docker run --name testdbcontainer -e MYSQL_ROOT_PASSWORD=test -p 3306:3306 -d mariadb
+# If you want to run another version (10.3)
+$ docker run --name testdbcontainer -e MYSQL_ROOT_PASSWORD=test -p 3306:3306 -d mariadb:10.3
 ```
 
 3. Execute
@@ -47,6 +53,16 @@ $ go get github.com/go-sql-driver/mysql
 > rename user 'user'@'localhost' to 'user'@'%';
 ```
 
+### Create Table
+```sh
+> 
+// CREATE TABLE statuses(  
+//     id INT NOT NULL AUTO_INCREMENT,  
+//     tx_id VARCHAR(100) NOT NULL,  
+//     code VARCHAR(40) NOT NULL,      
+//     PRIMARY KEY ( id )
+// );
+```
 
 
 ### Log
@@ -71,6 +87,7 @@ MariaDB [(none)]>
 
 
 ## References
+- [gorm.io](https://gorm.io/)
 - [Connecting a Go application to Oracle Database - Developers Blog, Oracle](https://blogs.oracle.com/developers/post/connecting-a-go-application-to-oracle-database)
 - [lucasjellema/go-oracle-database - github](https://github.com/lucasjellema/go-oracle-database)
 - [mariadb - using in mac M1](https://two-track.tistory.com/21)

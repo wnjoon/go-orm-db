@@ -7,7 +7,7 @@ import (
 func main() {
 	oracleTest()
 	db := maria.Connect("admin", "adminpw", "localhost", "3306", "blockchain")
-	// maria.Insert("0x10319230812", "1", db)
+	maria.Insert("0x10319230812", "3", db)
 	maria.Query("0x10319230812", db)
 
 }
