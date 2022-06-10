@@ -3,27 +3,19 @@ package oracle
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 
-	"github.com/joho/godotenv"
-	"github.com/pkg/errors"
+	"github.com/wnjoon/go-orm-db/util"
 )
 
-func handleErr(err error, errMsg string) {
-	if err != nil {
-		log.Panic(errors.Wrap(err, errOpenDB))
-	}
-}
-
 func connect() *sql.DB {
-	env()
+	util.Env()
 	return open()
 }
 
 func open() *sql.DB {
 	db, err := sql.Open("oracle", getConnectionInfo())
-	handleErr(err, errOpenDB)
+	util.HandleErr(err, util.ErrOpenDB)
 	return db
 }
 
@@ -31,27 +23,27 @@ func execute(sql string) {
 	db := connect()
 	defer func() {
 		err := db.Close()
-		handleErr(err, errCloseDB)
+		util.HandleErr(err, util.ErrCloseDB)
 	}()
 	_, err := db.Exec(sql)
-	handleErr(err, errExecStmt)
+	util.HandleErr(err, util.ErrExecStmt)
 }
 
 func prepareAndExcute(org, mnemonic, passphrase string) int64 {
 	db := connect()
 	defer func() {
 		err := db.Close()
-		handleErr(err, errCloseDB)
+		util.HandleErr(err, util.ErrCloseDB)
 	}()
 	sql := fmt.Sprintf(insertRow, os.Getenv("ORACLE_TABLE_NAME"))
 	stmt, err := db.Prepare(sql)
-	handleErr(err, errPrepare)
+	util.HandleErr(err, util.ErrPrepare)
 
 	execResult, err := stmt.Exec(org, mnemonic, passphrase)
-	handleErr(err, errExecStmt)
+	util.HandleErr(err, util.ErrExecStmt)
 
 	row, err := execResult.RowsAffected()
-	handleErr(err, errRowUpdate)
+	util.HandleErr(err, util.ErrRowUpdate)
 	return row
 }
 
@@ -59,7 +51,7 @@ func getRow(org string) (string, string) {
 	db := connect()
 	defer func() {
 		err := db.Close()
-		handleErr(err, errCloseDB)
+		util.HandleErr(err, util.ErrCloseDB)
 	}()
 	var (
 		mnemonic   string
@@ -69,15 +61,8 @@ func getRow(org string) (string, string) {
 	sql := fmt.Sprintf(selectRow, os.Getenv("ORACLE_TABLE_NAME"), org)
 	row := db.QueryRow(sql)
 	err := row.Scan(&mnemonic, &passphrase)
-	handleErr(err, errScanRow)
+	util.HandleErr(err, util.ErrScanRow)
 	return mnemonic, passphrase
-}
-
-func env() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		handleErr(err, errLoadEnv)
-	}
 }
 
 func getConnectionInfo() string {
@@ -86,15 +71,3 @@ func getConnectionInfo() string {
 		"@" + os.Getenv("ORACLE_SVR_IP") + ":" + os.Getenv("ORACLE_SVC_PORT") +
 		"/" + os.Getenv("ORACLE_SVC_NAME")
 }
-
-// Error Response
-const (
-	errLoadEnv   string = ".env load failed"
-	errOpenDB    string = "database open failed"
-	errCloseDB   string = "database close failed"
-	errExecStmt  string = "execute statement failed"
-	errPrepare   string = "prepare statement falied"
-	errRowUpdate string = "row update failed"
-	errQueryRow  string = "query row failed"
-	errScanRow   string = "next row in multiple rows"
-)
